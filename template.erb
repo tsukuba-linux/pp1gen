@@ -1,0 +1,51 @@
+<%
+   name = "つくらぐ"
+   id = "200911458"
+   th_num = 3
+%>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>プログラミング入門I 演習報告書 - 演習<%= th_num.to_s %></title>
+  </head>
+  <body>
+    <div id="cover">
+      <h1 id="title">プログラミング入門I 演習報告書</h1>
+      <h2 id="q_no">演習<%= th_num.to_s %></h2>
+      <div id="sign">
+	<p><%=  Time.now.strftime("%Y年%m月%d日") %></p>
+	<p><%= id %> - <%= name %></p>
+	<p>s<%= id[2..-1] %>@coins.tsukuba.ac.jp</p>
+      </div>
+    </div>
+    <%
+       htlet = ""
+       cmds = []
+       files = Dir.glob("th#{th_num}/*.c").sort
+       files.each do |s|
+         s[/\_([0-9]+)\.c/]
+         q_num = $1
+         open(s) do |f|
+           code = f.read
+           htlet << "    <br>\n    <h2 class=\"ques\">課題#{q_num}</h2>\n"
+           htlet << "    <h3 class=\"source\">プログラムリスト</h2>\n"
+           htlet << "    <pre>\n#{code.gsub("<", "&lt;").gsub(">", "&gt;")}</pre>\n"
+           cmds = []
+           code.split("\n").each do |l|
+             cmds << l[3..-1] if l[0..2] == "<$>"
+           end
+         end
+
+         htlet << "    <h3 class=\"log\">結果</h2>\n"
+         `gcc -lm #{s}`
+         log = ""
+         cmds.each do |cmd|
+           log << "$ #{cmd}\n"
+           log << `#{cmd}`
+         end
+         htlet << "    <pre>\n#{log}</pre>\n"
+       end
+       %>
+<%= htlet %>
+  </body>
+</html>
